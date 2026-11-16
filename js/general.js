@@ -1134,6 +1134,10 @@ class App {
     const btnSubmit = projectForm.querySelector(".form__btn--done");
     const btnEdit = projectForm.querySelector(".form__btn--edit");
 
+    // Set input values
+    latitude.value = (+this.#project.coords[0]).toFixed(6);
+    longitude.value = (+this.#project.coords[1]).toFixed(6);
+
     projectForm
       .querySelectorAll("input")
       .forEach((input) => (input.disabled = true));
