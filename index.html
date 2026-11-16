@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="lt">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <meta
+      name="description"
+      content="Elektromap tai internetinė aplikacija skirta matuoti atstumą tarp objektų. Naudojant globalias arba lietuvos kordinačių sistemos koordinates, sugeneruoti objektus. Juos atvaizduoti, redaguoti arba pakeisti objekto lokacija į norimą vietą žemėlapyje."
+    />
+    <link rel="icon" href="./public/images/favicon.png" />
+    <link rel="apple-touch-icon" href="./public/images/apple-touch-icon.png" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+
+    <link rel="stylesheet" href="./css/style.css" />
+    <link rel="stylesheet" href="./css/queries.css" />
+
+    <!--Icon pack library-->
+    <script defer src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!--Read excel file library-->
+    <script defer src="./js/read-excel-file.min.js"></script>
+    <!--Leaflet map library-->
+    <link rel="stylesheet" href="./leaflet/dist/leaflet.css" />
+    <script defer src="./leaflet/dist/leaflet.js"></script>
+
+    <script defer src="./js/utilities.js"></script>
+    <script defer src="./js/general.js"></script>
+
+    <title>ElektroMap &mdash; atstumų skaičiuoklė</title>
+  </head>
+  <body>
+    <!--BUGFIXME-->
+    <!-- <figure class="documentation">
+      <button class="btn btn--close-documentation">&times;</button>
+      <div class="documentation-content">
+        <ul class="documentation-nav">
+          <li class="documentation-nav--item">1. Titulas</li>
+          <li class="documentation-nav--item">2. Idejimas</li>
+          <li class="documentation-nav--item">3. Norejimas</li>
+        </ul>
+        <article class="documentation--main">
+          <h2>Dokumentacija</h2>
+        </article>
+      </div>
+      <div class="documentation-nav--page">1/3</div>
+    </figure>
+    <div class="overlay"></div> -->
+    <aside class="sidebar">
+      <img
+        src="./public/images/logo.webp"
+        alt="ElektroMap logotipas"
+        draggable="false"
+        class="logo"
+      />
+      <button class="btn main-menu">
+        <i class="ph ph-list" aria-label="Pagrindinis meniu"></i>
+      </button>
+
+      <nav class="tab-container">
+        <button class="btn tab project--tab tab--active" data-tab="0">
+          Projektas
+        </button>
+        <button class="btn tab station--tab" data-tab="1">Elektrinės</button>
+      </nav>
+
+      <main class="main-content">
+        <div class="tab__content-container project--content scroll-bar">
+          <div class="tab--content">
+            <form class="form project--form">
+              <div
+                class="form__row form__row--coords"
+                data-description="Koordinatės"
+              >
+                <input
+                  class="form__input form__input--latitude invalid"
+                  type="text"
+                  name="latitude"
+                  placeholder="Platuma"
+                  autocomplete="off"
+                  inputmode="numeric"
+                />
+                <input
+                  class="form__input form__input--longitude invalid"
+                  type="text"
+                  name="longitude"
+                  placeholder="Ilguma"
+                  autocomplete="off"
+                  inputmode="numeric"
+                />
+                <div class="form--checkbox">
+                  <label for="project--check">LKS-94</label>
+                  <input
+                    id="project--check"
+                    class="form__input--lksToWgs"
+                    type="checkbox"
+                    autocomplete="off"
+                  />
+                </div>
+              </div>
+
+              <div
+                class="form__row form__row--radius"
+                data-description="Elektrinių spindulys į kurį patenka objektas"
+              >
+                <span class="station__icon icon--radius"
+                  ><i class="ph-bold ph-angle"></i
+                ></span>
+                <input
+                  class="form__input form__input--radius"
+                  id="form--radius"
+                  placeholder="Spindulys"
+                  type="text"
+                  value="15"
+                  autocomplete="off"
+                  inputmode="numeric"
+                />
+                <span class="station__unit">KM</span>
+              </div>
+              <div class="form__row form__row--submit">
+                <button
+                  class="btn form__btn form__btn--edit hidden"
+                  data-description="Redaguoti projektą"
+                >
+                  <i class="ph-bold ph-arrows-clockwise"></i>
+                </button>
+                <button
+                  class="btn form__btn form__btn--done form__btn--disable"
+                  data-description="Išsaugoti projekto duomenis"
+                >
+                  <i class="ph-bold ph-check"></i>
+                </button>
+                <button
+                  class="btn form__btn form__btn--cancel"
+                  data-description="Ištrinti įvestus duomenis"
+                >
+                  <i class="ph-bold ph-x"></i>
+                </button>
+              </div>
+            </form>
+            <ul class="stations"></ul>
+          </div>
+        </div>
+        <div class="tab__content-container station--content scroll-bar">
+          <div class="tab--content">
+            <form class="form__search--stations">
+              <div class="container__search--stations">
+                <div class="container--form__input">
+                  <input
+                    class="form__input hidden"
+                    type="text"
+                    autocomplete="off"
+                    name="search"
+                  />
+                </div>
+                <button class="btn btn--search">
+                  <i
+                    class="ph-bold ph-list-magnifying-glass search__icon icon--search active"
+                    data-type="search"
+                    data-description="Ieškoti elektrinės"
+                    aria-label="Paieškos mygtukas"
+                  ></i>
+                  <i
+                    class="ph-fill ph-backspace search__icon icon--clear"
+                    data-type="clear"
+                    data-description="Uždaryti paieškos lauką"
+                    aria-label="Išvalyti paiešką mygtukas"
+                  ></i>
+                </button>
+              </div>
+              <button
+                class="btn btn--new__station"
+                data-description="pridėti elektrinę"
+              >
+                <i class="ph-bold ph-plus search__icon"></i>
+              </button>
+            </form>
+
+            <ul class="stations"></ul>
+          </div>
+        </div>
+      </main>
+
+      <footer class="footer">
+        <p class="footer--text">
+          &copy; <span class="footer--year">2024</span> Antanas Jasiulionis
+        </p>
+        <ul class="footer--list">
+          <li>
+            <a
+              href="https://lt.linkedin.com/in/antanas-jasiulionis"
+              class="footer--link"
+              draggable="false"
+              target="_blank"
+              ><i
+                class="ph ph-linkedin-logo"
+                aria-label="LinkedIn logotipas"
+              ></i>
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://antanas-jasiulionis.lt/"
+              target="_blank"
+              draggable="false"
+              class="footer--link"
+            >
+              <img
+                src="./public/icons/portfolio.svg"
+                alt="Antano portfolio svetainės logotipas"
+                draggable="false"
+              />
+            </a>
+          </li>
+        </ul>
+      </footer>
+    </aside>
+    <div id="map"></div>
+    <div class="preloader">
+      <span class="preloader-dot preloader-dot--1"></span>
+      <span class="preloader-dot preloader-dot--2"></span>
+      <span class="preloader-dot preloader-dot--3"></span>
+    </div>
+    <div class="preloader--overlay"></div>
+    <div class="screen-limiter"><span>Ekrano rezoliucija per maža</span></div>
+    <div class="screen-limiter--overlay"></div>
+  </body>
+</html>
