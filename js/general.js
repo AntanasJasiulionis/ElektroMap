@@ -223,16 +223,16 @@ class App {
 
         if (type === "noExcel")
           ui._showPopupWindow(
-            `Nepavyko nuskaityti Excelio failo: <span>${fileName}</span>\n${error}`,
+            `Nepavyko nuskaityti Excelio failo:<br/><span>${fileName}</span><br/>${error}`,
           );
 
         if (type === "noData")
           ui._showPopupWindow(
-            `Excelio faile <span>${fileName}</span> nebuvo lapo pavadinimu „Elektrinės“`,
+            `Excelio faile nebuvo lapo pavadinimu „Elektrinės“<br/><span>${fileName}</span>`,
           );
         if (type === "emptyData")
           ui._showPopupWindow(
-            `Excelio failas <span>${fileName}</span> yra tuščias`,
+            `Excelio failas yra tuščias<br/><span>${fileName}</span>`,
           );
       };
 
