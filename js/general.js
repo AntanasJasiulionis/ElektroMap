@@ -1131,6 +1131,8 @@ class App {
     const projectForm = document.querySelector(".project--form");
     if (!projectForm) return;
 
+    const latitude = projectForm.querySelector(".form__input--latitude");
+    const longitude = projectForm.querySelector(".form__input--longitude");
     const btnSubmit = projectForm.querySelector(".form__btn--done");
     const btnEdit = projectForm.querySelector(".form__btn--edit");
 
