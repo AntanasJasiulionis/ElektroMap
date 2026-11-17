@@ -454,7 +454,7 @@ class App {
     }).setView([54.896804, 23.901616], this.#mapZoomLevel);
 
     this.#tileLayer = L.tileLayer(
-      "http://{s}.google.com/vt?lyrs=m&x={x}&y={y}&z={z}",
+      "https://{s}.google.com/vt?lyrs=m&x={x}&y={y}&z={z}",
       {
         noWrap: true,
         maxZoom: 20,
@@ -983,8 +983,8 @@ class App {
     // Change Tile layer on map
     this.#tileLayer.setUrl(
       isSatellite
-        ? "http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}"
-        : "http://{s}.google.com/vt?lyrs=m&x={x}&y={y}&z={z}",
+        ? "https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}"
+        : "https://{s}.google.com/vt?lyrs=m&x={x}&y={y}&z={z}",
     );
 
     // Change tile view
@@ -1426,6 +1426,13 @@ class UI {
   //ContextMenu
   #openContextMenu(e) {
     e.preventDefault();
+    const screenLimiterOverlay = e.target.closest(".screen-limiter--overlay");
+    const screenLimiter = e.target.closest(".screen-limiter");
+    const preloader = e.target.closest(".preloader");
+    const preloaderOverlay = e.target.closest(".preloader--overlay");
+    if (screenLimiter || screenLimiterOverlay || preloader || preloaderOverlay)
+      return;
+
     const openMenu = function ({
       marker = false,
       card = false,
