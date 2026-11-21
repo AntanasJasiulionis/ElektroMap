@@ -1,10 +1,10 @@
-"use strict";
+'use strict';
 
-const body = document.querySelector("body");
-const sidebarContainer = document.querySelector(".sidebar");
-const tabsConatiner = document.querySelector(".tab-container");
-const tabs = document.querySelectorAll(".tab");
-const tabsContent = document.querySelectorAll(".tab__content-container");
+const body = document.querySelector('body');
+const sidebarContainer = document.querySelector('.sidebar');
+const tabsConatiner = document.querySelector('.tab-container');
+const tabs = document.querySelectorAll('.tab');
+const tabsContent = document.querySelectorAll('.tab__content-container');
 
 /////////////////////////////////////////////
 // STATION ARCHITECTURE
@@ -28,7 +28,7 @@ class Station {
     const icon = L.icon({
       iconUrl: `./leaflet/dist/images/${this.type}-marker-icon.png`,
       iconRetinaUrl: `./leaflet/dist/images/${this.type}-marker-icon-2x.png`,
-      shadowUrl: "./leaflet/dist/images/marker-shadow.png",
+      shadowUrl: './leaflet/dist/images/marker-shadow.png',
       iconSize: [25, 41],
       shadowSize: [41, 41],
       iconAnchor: [12, 41],
@@ -39,7 +39,7 @@ class Station {
     this.#marker = L.marker(this.coords, {
       icon,
       riseOnHover: true,
-      alt: `${this?.title || "Projekto"} žymeklis`,
+      alt: `${this?.title || 'Projekto'} žymeklis`,
     })
       .bindPopup(
         L.popup({
@@ -63,9 +63,9 @@ class Station {
   #setPopupContentElement() {
     let html = `
       <div>
-        <span class="leaflet-popup--title">${this?.title || "Projektas"}</span>
+        <span class="leaflet-popup--title">${this?.title || 'Projektas'}</span>
     `;
-    if (this.type === "station")
+    if (this.type === 'station')
       html += `
         <div class="leaflet-popup-sum__container">
           <span class="leaflet-popup-sum--icon">
@@ -88,7 +88,7 @@ class Station {
 }
 
 class Project extends Station {
-  type = "project";
+  type = 'project';
 
   constructor(coords, radius) {
     super(coords);
@@ -97,7 +97,7 @@ class Project extends Station {
 }
 
 class Power extends Station {
-  type = "station";
+  type = 'station';
   #distance = { km: undefined, m: undefined };
 
   constructor(coords, title, balance) {
@@ -154,12 +154,12 @@ class App {
 
     // Set Global 'Submit' event for map
     sidebarContainer.addEventListener(
-      "submit",
+      'submit',
       this.#globalSubmitEvent.bind(this),
     );
 
     // Remove preloader when page fully loads
-    window.addEventListener("load", this.#removePreloader.bind(this));
+    window.addEventListener('load', this.#removePreloader.bind(this));
   }
 
   // Global Events
@@ -178,15 +178,15 @@ class App {
 
   // Forms submitting
   async #createNewStation(e) {
-    const newStationForm = e.target.closest(".form__station--new");
-    if (!newStationForm || newStationForm.classList.contains("hidden")) return;
+    const newStationForm = e.target.closest('.form__station--new');
+    if (!newStationForm || newStationForm.classList.contains('hidden')) return;
 
     const formType = newStationForm.dataset.formType;
     const latitude = newStationForm.querySelector(
-      ".form__input--latitude",
+      '.form__input--latitude',
     ).value;
     const longitude = newStationForm.querySelector(
-      ".form__input--longitude",
+      '.form__input--longitude',
     ).value;
     const isLksToWgsCheckedManual = newStationForm.querySelector(
       ".form__station--new-container[data-form='manual'] .form__input--lksToWgs",
@@ -194,12 +194,12 @@ class App {
     const isLksToWgsCheckedExcel = newStationForm.querySelector(
       ".form__station--new-container[data-form='excel'] .form__input--lksToWgs",
     ).checked;
-    const title = newStationForm.querySelector(".form__input--title").value;
-    const balance = newStationForm.querySelector(".form__input--balance").value;
-    const file = newStationForm.querySelector(".input--file").files;
+    const title = newStationForm.querySelector('.form__input--title').value;
+    const balance = newStationForm.querySelector('.form__input--balance').value;
+    const file = newStationForm.querySelector('.input--file').files;
     let stations = [];
 
-    if (formType === "manual") {
+    if (formType === 'manual') {
       // Add loader
       ui._addLoader();
 
@@ -217,20 +217,20 @@ class App {
 
       stations.push(new Power(coords, title, +balance));
     }
-    if (formType === "excel") {
+    if (formType === 'excel') {
       const errorMessage = function (type, fileName, error) {
         ui._removeLoader({ instant: true });
 
-        if (type === "noExcel")
+        if (type === 'noExcel')
           ui._showPopupWindow(
             `Nepavyko nuskaityti Excelio failo:<br/><span>${fileName}</span><br/>${error}`,
           );
 
-        if (type === "noData")
+        if (type === 'noData')
           ui._showPopupWindow(
             `Excelio faile nebuvo lapo pavadinimu „Elektrinės“<br/><span>${fileName}</span>`,
           );
-        if (type === "emptyData")
+        if (type === 'emptyData')
           ui._showPopupWindow(
             `Excelio failas yra tuščias<br/><span>${fileName}</span>`,
           );
@@ -242,14 +242,14 @@ class App {
       if (file.length === 0) return ui._removeLoader({ instant: true });
 
       const [data] = await readXlsxFile(file[0])
-        .then((data) => data.filter((obj) => obj.sheet === "Elektrinės"))
-        .catch((error) => errorMessage("noExcel", file[0].name, error));
+        .then(data => data.filter(obj => obj.sheet === 'Elektrinės'))
+        .catch(error => errorMessage('noExcel', file[0].name, error));
 
       // If no Sheet "Elektrinės" throw error and return
-      if (!data) return errorMessage("noData", file[0].name);
+      if (!data) return errorMessage('noData', file[0].name);
 
       // If excel data is completely empty throw error and return
-      if (data.data.length <= 1) return errorMessage("emptyData", file[0].name);
+      if (data.data.length <= 1) return errorMessage('emptyData', file[0].name);
 
       // Format data and push to temp stations []
       data.data.forEach(([lat, lon, t, sum], i) => {
@@ -261,7 +261,7 @@ class App {
         const longitude =
           +lon || (isLksToWgsCheckedExcel ? 6084530 : 23.901616);
 
-        const title = t || "Elektrinės pavadinimas";
+        const title = t || 'Elektrinės pavadinimas';
         const balance = +sum || 0;
 
         const coords = isLksToWgsCheckedExcel
@@ -271,9 +271,9 @@ class App {
         stations.push(new Power(coords, title, balance));
       });
     }
-    if (formType === "excel") stations.reverse();
+    if (formType === 'excel') stations.reverse();
 
-    stations.forEach((station) => {
+    stations.forEach(station => {
       // Add new object to stations array
       this.#stations.push(station);
 
@@ -306,21 +306,21 @@ class App {
     ui._removeLoader({ instant: true });
 
     // Move view to the marker/markers
-    if (formType === "manual") this._moveToMarker(stations[0].coords, 12);
-    if (formType === "excel") this.#moveToAllMarkers();
+    if (formType === 'manual') this._moveToMarker(stations[0].coords, 12);
+    if (formType === 'excel') this.#moveToAllMarkers();
   }
   #createProject(e) {
-    const projectForm = e.target.closest(".project--form");
+    const projectForm = e.target.closest('.project--form');
     if (!projectForm) return;
 
-    const latitude = projectForm.querySelector(".form__input--latitude").value;
+    const latitude = projectForm.querySelector('.form__input--latitude').value;
     const longitude = projectForm.querySelector(
-      ".form__input--longitude",
+      '.form__input--longitude',
     ).value;
     const isChecked = projectForm.querySelector(
-      ".form__input--lksToWgs",
+      '.form__input--lksToWgs',
     ).checked;
-    const radius = projectForm.querySelector(".form__input--radius").value;
+    const radius = projectForm.querySelector('.form__input--radius').value;
 
     ui._addLoader();
 
@@ -351,7 +351,7 @@ class App {
     }
     // Update station card distances if stations exists
     if (this.#stations.length !== 0)
-      this.#stations.forEach((station) => {
+      this.#stations.forEach(station => {
         station.distance = getDistance(this.#project.coords, station.coords);
         this.#updateStationCard(station);
       });
@@ -372,23 +372,23 @@ class App {
     this._moveToMarker(this.#project.coords, 12);
   }
   #updateStation(e) {
-    const stationForm = e.target.closest(".station--form");
+    const stationForm = e.target.closest('.station--form');
     if (!stationForm) return;
 
     const station = this._searchStationById(
-      e.target.closest(".station")?.dataset.id,
+      e.target.closest('.station')?.dataset.id,
     );
     if (!station) return;
 
-    const latitude = stationForm.querySelector(".form__input--latitude").value;
+    const latitude = stationForm.querySelector('.form__input--latitude').value;
     const longitude = stationForm.querySelector(
-      ".form__input--longitude",
+      '.form__input--longitude',
     ).value;
     const isLksToWgsChecked = stationForm.querySelector(
-      ".form__input--lksToWgs",
+      '.form__input--lksToWgs',
     ).checked;
-    const title = stationForm.querySelector(".form__input--title").value;
-    const balance = stationForm.querySelector(".form__input--balance").value;
+    const title = stationForm.querySelector('.form__input--title').value;
+    const balance = stationForm.querySelector('.form__input--balance').value;
 
     // Add loader
     ui._addLoader();
@@ -433,20 +433,20 @@ class App {
   // Map
   #loadMap() {
     const createTileView = function () {
-      const map = document.getElementById("map");
+      const map = document.getElementById('map');
       const html = `
         <figure figure class="map-tile__view hidden" data-map-tile-view="1">
           <p class="map-tile__view--text">Palydovas</p>
         </figure>
       `;
 
-      map.insertAdjacentHTML("afterbegin", html);
+      map.insertAdjacentHTML('afterbegin', html);
 
-      const tileView = document.querySelector(".map-tile__view");
-      setTimeout(() => tileView.classList.remove("hidden"), 10);
+      const tileView = document.querySelector('.map-tile__view');
+      setTimeout(() => tileView.classList.remove('hidden'), 10);
     };
 
-    this.#map = L.map("map", {
+    this.#map = L.map('map', {
       attributionControl: false,
       minZoom: this.#minZoomLithuania,
       maxBounds: this.#lithuaniaBounds,
@@ -454,11 +454,11 @@ class App {
     }).setView([54.896804, 23.901616], this.#mapZoomLevel);
 
     this.#tileLayer = L.tileLayer(
-      "https://{s}.google.com/vt?lyrs=m&x={x}&y={y}&z={z}",
+      'https://{s}.google.com/vt?lyrs=m&x={x}&y={y}&z={z}',
       {
         noWrap: true,
         maxZoom: 20,
-        subdomains: ["mt0", "mt1", "mt2", "mt3"],
+        subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
       },
     );
 
@@ -479,14 +479,14 @@ class App {
       this.#map.fitBounds([this.#project.coords], options);
 
     if (this.#stations.length !== 0) {
-      this.#stations.forEach((station) => {
+      this.#stations.forEach(station => {
         station.marker.addTo(this.#map);
         station.marker._icon.dataset.id = station.id;
       });
 
       // Fit all markers on the map
       this.#map.fitBounds(
-        this.#stations.map((station) => station.coords),
+        this.#stations.map(station => station.coords),
         options,
       );
     }
@@ -501,30 +501,30 @@ class App {
   // Project Cards
   #renderProjectCards() {
     const projectText = document.querySelector(
-      ".project--content .project--text",
+      '.project--content .project--text',
     );
     const projectStationsContainer = document.querySelector(
-      ".project--content .stations",
+      '.project--content .stations',
     );
     const projectStations = document.querySelectorAll(
-      ".project--content .station",
+      '.project--content .station',
     );
     const clearTabContent = () => {
       // Remove text if exists
       if (projectText) projectText.parentElement.removeChild(projectText);
 
       // Remove project cards if they exist
-      if (projectStations.length !== 0) projectStationsContainer.innerHTML = "";
+      if (projectStations.length !== 0) projectStationsContainer.innerHTML = '';
 
       // Remove polylines
-      this.#map.eachLayer((layer) => {
+      this.#map.eachLayer(layer => {
         if (layer instanceof L.Polyline) this.#map.removeLayer(layer);
       });
     };
     const createProjectText = ({ isNearest = false, empty = false } = {}) => {
       const setHtml = () => {
         let html = `
-        <div class="project--text${!isNearest && empty ? " empty" : ""}">
+        <div class="project--text${!isNearest && empty ? ' empty' : ''}">
           <p>Elektrinės į kurias patenka projektas</p>
           <span class="station__value">${this.#project.radius}</span>
           <span class="station__unit">KM</span>
@@ -539,7 +539,7 @@ class App {
 
         return html;
       };
-      projectStationsContainer.insertAdjacentHTML("beforebegin", setHtml());
+      projectStationsContainer.insertAdjacentHTML('beforebegin', setHtml());
     };
     clearTabContent();
     if (!this.#project || this.#stations.length === 0) return;
@@ -560,7 +560,7 @@ class App {
     );
 
     const stationsInsideProject = stations.filter(
-      (station) =>
+      station =>
         station.distance.km * 1000 + station.distance.m <=
         this.#project.radius * 1000 + allowance,
     );
@@ -568,7 +568,7 @@ class App {
     // Render Cards inside radius
     if (stationsInsideProject.length !== 0) {
       createProjectText();
-      stationsInsideProject.forEach((station) => {
+      stationsInsideProject.forEach(station => {
         this.#renderStationCard(station, { onlyShow: true });
         this.#renderPolyline(station);
       });
@@ -576,7 +576,7 @@ class App {
 
     // Render nearest Cards if they not inside radius
     if (stationsInsideProject.length === 0) {
-      const nearestStations = stations.filter((station) => {
+      const nearestStations = stations.filter(station => {
         const stationsBiggerThanRadius =
           this.#project.radius * 1000 <=
           station.distance.km * 1000 + station.distance.m;
@@ -614,7 +614,7 @@ class App {
     if (!station) return;
 
     // Delete Station Card
-    stationEl.classList.add("hidden");
+    stationEl.classList.add('hidden');
     setTimeout(() => {
       const stationEl = document.querySelector(
         `.station--content .station[data-id="${id}"]`,
@@ -628,7 +628,7 @@ class App {
     station.removeMarker();
 
     // Remove from Stations
-    const index = this.#stations.findIndex((station) => station.id === id);
+    const index = this.#stations.findIndex(station => station.id === id);
     this.#stations.splice(index, 1);
 
     // Save to Local Storage
@@ -739,9 +739,9 @@ class App {
             <span class="station__icon icon--distance">
               <i class="ph ph-ruler"></i>
             </span>
-            <span class="station__value">${station.distance.km ?? "\u2014"}</span>
+            <span class="station__value">${station.distance.km ?? '\u2014'}</span>
             <span class="station__unit">KM</span>
-            <span class="station__value">${station.distance.m ?? "\u2014"}</span>
+            <span class="station__value">${station.distance.m ?? '\u2014'}</span>
             <span class="station__unit">M</span>
           </div>
         </figure>
@@ -751,18 +751,18 @@ class App {
     };
     let parent;
     if (!onlyShow)
-      parent = document.querySelector(".station--content .stations");
+      parent = document.querySelector('.station--content .stations');
     if (onlyShow)
-      parent = document.querySelector(".project--content .stations");
+      parent = document.querySelector('.project--content .stations');
 
-    parent.insertAdjacentHTML("afterbegin", setHtml());
+    parent.insertAdjacentHTML('afterbegin', setHtml());
   }
   _renderAllStationCards() {
     // Remove all station cards
     ui._removeAllStationCards();
 
     // Render all station cards
-    this.#stations.forEach((station) => this.#renderStationCard(station));
+    this.#stations.forEach(station => this.#renderStationCard(station));
 
     return this;
   }
@@ -772,23 +772,23 @@ class App {
     );
     if (cards.length === 0) return;
 
-    cards.forEach((card) => {
-      const title = card.querySelector("figure .station__title");
-      const balance = card.querySelector("figure .station__value");
+    cards.forEach(card => {
+      const title = card.querySelector('figure .station__title');
+      const balance = card.querySelector('figure .station__value');
       const [km, m] = card.querySelectorAll(
-        "figure .station__distance .station__value",
+        'figure .station__distance .station__value',
       );
 
       // Update the content
       title.textContent = station.title;
       balance.textContent = station.balance || 0;
-      km.textContent = station.distance.km ?? "\u2014";
-      m.textContent = station.distance.m ?? "\u2014";
+      km.textContent = station.distance.km ?? '\u2014';
+      m.textContent = station.distance.m ?? '\u2014';
     });
   }
   #renderPolyline(station) {
     L.polyline([station.coords, this.#project.coords], {
-      color: "#52bdf9",
+      color: '#52bdf9',
       weight: 2,
       opacity: 0.5,
       interactive: false,
@@ -814,36 +814,36 @@ class App {
         `;
         return html;
       };
-      const map = document.getElementById("map");
-      const overlay = document.createElement("div");
-      const overlayMap = document.createElement("div");
-      overlay.classList.add("overlay");
-      overlayMap.classList.add("overlay-map");
+      const map = document.getElementById('map');
+      const overlay = document.createElement('div');
+      const overlayMap = document.createElement('div');
+      overlay.classList.add('overlay');
+      overlayMap.classList.add('overlay-map');
 
       body.prepend(overlay);
       map.prepend(overlayMap);
-      map.insertAdjacentHTML("afterbegin", setHtml());
+      map.insertAdjacentHTML('afterbegin', setHtml());
 
-      setTimeout(() => body.classList.add("draggable--on"), 10);
+      setTimeout(() => body.classList.add('draggable--on'), 10);
 
-      station.marker._icon.classList.add("draggable");
+      station.marker._icon.classList.add('draggable');
       station.marker.dragging.enable();
     };
     const removeDraggableState = function () {
-      if (!body.classList.contains("draggable--on")) return;
+      if (!body.classList.contains('draggable--on')) return;
 
-      const overlay = document.querySelector(".overlay");
-      const overlayMap = document.querySelector(".overlay-map");
-      const dragMenu = document.querySelector(".drag-menu");
+      const overlay = document.querySelector('.overlay');
+      const overlayMap = document.querySelector('.overlay-map');
+      const dragMenu = document.querySelector('.drag-menu');
 
-      body.classList.remove("draggable--on");
+      body.classList.remove('draggable--on');
       setTimeout(() => {
         overlay.parentElement.removeChild(overlay);
         overlayMap.parentElement.removeChild(overlayMap);
         dragMenu.parentElement.removeChild(dragMenu);
       }, 250);
 
-      station.marker._icon.classList.remove("draggable");
+      station.marker._icon.classList.remove('draggable');
       station.marker.dragging.disable();
       station.updatePopupContent();
     };
@@ -853,17 +853,17 @@ class App {
     ui._removeStationsForm();
     this._closePopup();
 
-    if (body.classList.contains("draggable--on")) return;
+    if (body.classList.contains('draggable--on')) return;
     addDraggableState();
     const abortListeners = new AbortController();
     const option = { signal: abortListeners.signal };
 
-    const btnDone = document.querySelector(".drag-menu .drag__btn--done");
-    const btnCancel = document.querySelector(".drag-menu .drag__btn--cancel");
+    const btnDone = document.querySelector('.drag-menu .drag__btn--done');
+    const btnCancel = document.querySelector('.drag-menu .drag__btn--cancel');
 
     // Close draggable state on btnCancel click  or escape
     btnCancel.addEventListener(
-      "click",
+      'click',
       () => {
         abortListeners.abort();
         removeDraggableState();
@@ -871,10 +871,10 @@ class App {
       option,
     );
     document.addEventListener(
-      "keydown",
-      (e) => {
+      'keydown',
+      e => {
         e.preventDefault();
-        if (e.key === "Escape" && body.classList.contains("draggable--on")) {
+        if (e.key === 'Escape' && body.classList.contains('draggable--on')) {
           abortListeners.abort();
           removeDraggableState();
         }
@@ -884,9 +884,9 @@ class App {
 
     // Set new coords after click btnDone
     btnDone.addEventListener(
-      "click",
+      'click',
       () => {
-        const coords = Object.entries(station.marker.getLatLng()).map((value) =>
+        const coords = Object.entries(station.marker.getLatLng()).map(value =>
           value[1].toFixed(6),
         );
         abortListeners.abort();
@@ -911,7 +911,7 @@ class App {
     );
   }
   _searchStationById(id) {
-    return this.#stations.find((station) => station.id === id);
+    return this.#stations.find(station => station.id === id);
   }
   _moveToMarker(coords, zoom = this.#mapZoomLevel) {
     this._closePopup();
@@ -925,7 +925,7 @@ class App {
   #moveToAllMarkers() {
     this._closePopup();
     this.#map.flyToBounds(
-      this.#stations.map((station) => station.coords),
+      this.#stations.map(station => station.coords),
       {
         maxZoom: this.#mapZoomLevel + 1,
         animate: true,
@@ -938,19 +938,19 @@ class App {
 
   // Local Storage
   #setLocalStorage() {
-    localStorage.setItem("project", JSON.stringify(this.#project));
-    localStorage.setItem("stations", JSON.stringify(this.#stations));
+    localStorage.setItem('project', JSON.stringify(this.#project));
+    localStorage.setItem('stations', JSON.stringify(this.#stations));
   }
   #getLocalStorage() {
-    const projectData = JSON.parse(localStorage.getItem("project"));
-    const stationsData = JSON.parse(localStorage.getItem("stations"));
+    const projectData = JSON.parse(localStorage.getItem('project'));
+    const stationsData = JSON.parse(localStorage.getItem('stations'));
 
     if (projectData) {
       this.#project = new Project(projectData.coords, projectData.radius);
       this.#project.setMarker();
     }
     if (stationsData) {
-      stationsData.forEach((station) => {
+      stationsData.forEach(station => {
         const stationInstance = new Power(
           station.coords,
           station.title,
@@ -967,86 +967,86 @@ class App {
     }
   }
   resetLocalStorage() {
-    localStorage.removeItem("project");
-    localStorage.removeItem("stations");
+    localStorage.removeItem('project');
+    localStorage.removeItem('stations');
     location.reload();
   }
 
   // Utilities
   _changeTileLayer(e) {
-    const tileView = e.target.closest(".map-tile__view");
+    const tileView = e.target.closest('.map-tile__view');
     if (!tileView) return;
 
-    const text = tileView.querySelector(".map-tile__view--text");
+    const text = tileView.querySelector('.map-tile__view--text');
     const isSatellite = +tileView.dataset.mapTileView;
 
     // Change Tile layer on map
     this.#tileLayer.setUrl(
       isSatellite
-        ? "https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}"
-        : "https://{s}.google.com/vt?lyrs=m&x={x}&y={y}&z={z}",
+        ? 'https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}'
+        : 'https://{s}.google.com/vt?lyrs=m&x={x}&y={y}&z={z}',
     );
 
     // Change tile view
     tileView.dataset.mapTileView = isSatellite ? 0 : 1;
-    text.textContent = isSatellite ? "Žemėlapis" : "Palydovas";
+    text.textContent = isSatellite ? 'Žemėlapis' : 'Palydovas';
     tileView.style.setProperty(
-      "background-image",
-      `url(${isSatellite ? "./public/images/street.jpg" : "./public/images/satelite.jpg"})`,
+      'background-image',
+      `url(${isSatellite ? './public/images/street.jpg' : './public/images/satelite.jpg'})`,
     );
     tileView.style.setProperty(
-      "--color",
-      `${isSatellite ? "#17242b" : "#e6f6fe"}`,
+      '--color',
+      `${isSatellite ? '#17242b' : '#e6f6fe'}`,
     );
   }
   _resetProjectInputs({ edit = false } = {}) {
-    const allInputs = document.querySelectorAll(".project--form input");
-    const btnSubmit = document.querySelector(".project--form .form__btn--done");
-    const btnEdit = document.querySelector(".project--form .form__btn--edit");
+    const allInputs = document.querySelectorAll('.project--form input');
+    const btnSubmit = document.querySelector('.project--form .form__btn--done');
+    const btnEdit = document.querySelector('.project--form .form__btn--edit');
 
     // Reset inputs
-    allInputs.forEach((input) => {
+    allInputs.forEach(input => {
       // Enable inputs
       input.disabled = false;
 
       // Reset input value and remove error messages
-      if (input.type === "text") {
+      if (input.type === 'text') {
         ui._removeErrorMessage(input);
-        input.value = "";
+        input.value = '';
       }
 
       // Remove checked from checkbox
       if (!edit) {
-        if (input.type === "checkbox") input.checked = false;
+        if (input.type === 'checkbox') input.checked = false;
       }
       // Add default input only for radius
       if (!edit) {
-        if (input.classList.contains("form__input--radius")) input.value = 15;
+        if (input.classList.contains('form__input--radius')) input.value = 15;
       }
 
       // Change set input values to project values if edit pressed
       if (edit && this.#project) {
-        if (input.classList.contains("form__input--radius"))
+        if (input.classList.contains('form__input--radius'))
           input.value = this.#project.radius;
 
-        if (input.classList.contains("form__input--latitude")) {
+        if (input.classList.contains('form__input--latitude')) {
           input.value = this.#project.coords[0];
           input.focus({ preventScroll: true });
         }
 
-        if (input.classList.contains("form__input--longitude"))
+        if (input.classList.contains('form__input--longitude'))
           input.value = this.#project.coords[1];
       }
     });
 
     if (!edit) {
       // Add invalid class to text inputs
-      allInputs.forEach((input) => {
+      allInputs.forEach(input => {
         if (
-          input.type === "text" &&
-          !input.classList.contains("form__input--radius")
+          input.type === 'text' &&
+          !input.classList.contains('form__input--radius')
         )
-          input.classList.add("invalid");
+          input.classList.add('invalid');
       });
 
       // Remove project
@@ -1057,8 +1057,8 @@ class App {
 
         // Delete all distances from cards if stations exists
         if (this.#stations.length !== 0)
-          this.#stations.forEach((station) => {
-            station.distance = "";
+          this.#stations.forEach(station => {
+            station.distance = '';
             this.#updateStationCard(station);
           });
 
@@ -1071,17 +1071,17 @@ class App {
     }
 
     //Reset submit button to show
-    btnSubmit.classList.remove("hidden");
-    btnEdit.classList.add("hidden");
-    if (!edit) btnSubmit.classList.add("form__btn--disable");
+    btnSubmit.classList.remove('hidden');
+    btnEdit.classList.add('hidden');
+    if (!edit) btnSubmit.classList.add('form__btn--disable');
   }
-  _filterCardsBySearchBox = debounce((e) => {
+  _filterCardsBySearchBox = debounce(e => {
     const formatInput = function (input) {
-      return (input + "")
-        .split("")
-        .map((word) => word.trim().toLowerCase())
-        .join("")
-        .replace(/[,.]/g, "");
+      return (input + '')
+        .split('')
+        .map(word => word.trim().toLowerCase())
+        .join('')
+        .replace(/[,.]/g, '');
     };
     const createSearchResultText = function () {
       const html = `
@@ -1090,24 +1090,24 @@ class App {
         </li>
       `;
       const stationContainer = document.querySelector(
-        ".station--content .stations",
+        '.station--content .stations',
       );
-      stationContainer.insertAdjacentHTML("afterbegin", html);
+      stationContainer.insertAdjacentHTML('afterbegin', html);
     };
 
-    const searchBox = e.target.closest(".form__search--stations input");
-    if (!searchBox || searchBox.classList.contains("hidden")) return;
+    const searchBox = e.target.closest('.form__search--stations input');
+    if (!searchBox || searchBox.classList.contains('hidden')) return;
     if (this.#stations.length === 0) return;
 
     const input = formatInput(searchBox.value);
 
     if (searchBox.value.length > 0) {
       // Add loader to input
-      searchBox.classList.add("loading");
+      searchBox.classList.add('loading');
 
       // Filter stations which includes this input
       const filteredStations = this.#stations.filter(
-        (station) =>
+        station =>
           formatInput(station.title).includes(input) ||
           //Serach by coordinates
           // formatInput(station.coords).includes(input) ||
@@ -1120,52 +1120,52 @@ class App {
       if (filteredStations.length === 0) createSearchResultText();
 
       // Render filtered station cards
-      filteredStations.forEach((station) => this.#renderStationCard(station));
+      filteredStations.forEach(station => this.#renderStationCard(station));
 
       // Remove loader to input
-      setTimeout(() => searchBox.classList.remove("loading"), 500);
+      setTimeout(() => searchBox.classList.remove('loading'), 500);
     }
     if (searchBox.value.length === 0) this._renderAllStationCards();
   }, 500);
   #projectEditBtnShow() {
-    const projectForm = document.querySelector(".project--form");
+    const projectForm = document.querySelector('.project--form');
     if (!projectForm) return;
 
-    const latitude = projectForm.querySelector(".form__input--latitude");
-    const longitude = projectForm.querySelector(".form__input--longitude");
-    const btnSubmit = projectForm.querySelector(".form__btn--done");
-    const btnEdit = projectForm.querySelector(".form__btn--edit");
+    const latitude = projectForm.querySelector('.form__input--latitude');
+    const longitude = projectForm.querySelector('.form__input--longitude');
+    const btnSubmit = projectForm.querySelector('.form__btn--done');
+    const btnEdit = projectForm.querySelector('.form__btn--edit');
 
     // Set input values
     latitude.value = (+this.#project.coords[0]).toFixed(6);
     longitude.value = (+this.#project.coords[1]).toFixed(6);
 
     projectForm
-      .querySelectorAll("input")
-      .forEach((input) => (input.disabled = true));
-    btnSubmit.classList.add("form__btn--disable");
-    btnSubmit.classList.add("hidden");
-    btnEdit.classList.remove("hidden");
+      .querySelectorAll('input')
+      .forEach(input => (input.disabled = true));
+    btnSubmit.classList.add('form__btn--disable');
+    btnSubmit.classList.add('hidden');
+    btnEdit.classList.remove('hidden');
 
     return this;
   }
 
   // Check Inputs
   #notEmptyInputs(...inputs) {
-    return inputs.every((input) => input.length > 0);
+    return inputs.every(input => input.length > 0);
   }
   #validNumberInputs(...inputs) {
-    return inputs.every((input) => Number.isFinite(input));
+    return inputs.every(input => Number.isFinite(input));
   }
   #positiveInputs(...inputs) {
-    return inputs.every((input) => input >= 0);
+    return inputs.every(input => input >= 0);
   }
   #removePreloader() {
-    const preloader = document.querySelector(".preloader");
-    const overlay = document.querySelector(".preloader--overlay");
+    const preloader = document.querySelector('.preloader');
+    const overlay = document.querySelector('.preloader--overlay');
 
-    preloader.classList.add("hidden");
-    overlay.classList.add("hidden");
+    preloader.classList.add('hidden');
+    overlay.classList.add('hidden');
     setTimeout(() => {
       preloader.parentElement.removeChild(preloader);
       overlay.parentElement.removeChild(overlay);
@@ -1184,44 +1184,44 @@ class UI {
     this.#setYearFooter();
 
     // Set Global 'Click' Evenet
-    document.addEventListener("click", this.#globalClickEvent.bind(this));
+    document.addEventListener('click', this.#globalClickEvent.bind(this));
 
     // Set Global 'Context Menu' Event
     document.addEventListener(
-      "contextmenu",
+      'contextmenu',
       this.#globalContextEvent.bind(this),
     );
 
     // Set Global 'MouseOver' Event
     document.addEventListener(
-      "mouseover",
+      'mouseover',
       this.#globalMouseOverEvent.bind(this),
     );
 
     // Set Global 'MouseOut' Event
-    document.addEventListener("mouseout", this.#globalMouseOutEvent.bind(this));
+    document.addEventListener('mouseout', this.#globalMouseOutEvent.bind(this));
 
     // Set Global 'Input' Event
     sidebarContainer.addEventListener(
-      "input",
+      'input',
       this.#globalInputEvent.bind(this),
     );
 
     // Set Global 'Change' input Event
     sidebarContainer.addEventListener(
-      "change",
+      'change',
       this.#globalInputChangeEvenet.bind(this),
     );
 
     // Set Global 'Paste' input Event
     sidebarContainer.addEventListener(
-      "paste",
+      'paste',
       this.#globalPasteEvent.bind(this),
     );
   }
 
   #setYearFooter() {
-    const footerEl = document.querySelector(".footer--year");
+    const footerEl = document.querySelector('.footer--year');
     footerEl.textContent = new Date().getFullYear();
     return this;
   }
@@ -1266,6 +1266,12 @@ class UI {
 
     // Open Main Menu
     this.#openMenu(e);
+
+    // Accordion functionality
+    this.#documentationAccordion(e);
+
+    // Documentation show section
+    this.#documentationShowSection(e);
   }
   #globalMouseOverEvent(e) {
     // Show tooltip on mouseover for 1 second
@@ -1314,23 +1320,23 @@ class UI {
   #changeActiveTab(e, { setManual = [false, 0] } = {}) {
     const goToTab = function (tabId) {
       //Remove active classes
-      tabs.forEach((tab) => {
+      tabs.forEach(tab => {
         tab.disabled = true;
-        tab.classList.remove("tab--active");
+        tab.classList.remove('tab--active');
         setTimeout(() => (tab.disabled = false), 0.4 * 1000);
       });
 
       //Activate menu tab
       document
         .querySelector(`.tab[data-tab="${tabId}"]`)
-        .classList.add("tab--active");
+        .classList.add('tab--active');
 
       // Slide in to an active tab
       tabsContent.forEach((tab, i) => {
-        tab.classList.add("scroll-bar__hidden");
+        tab.classList.add('scroll-bar__hidden');
         tab.style.transform = `translateX(${(i - tabId) * 100}%)`;
         setTimeout(
-          () => tab.classList.remove("scroll-bar__hidden"),
+          () => tab.classList.remove('scroll-bar__hidden'),
           0.4 * 1000,
         );
       });
@@ -1338,9 +1344,9 @@ class UI {
     const [isSetManual, tabId] = setManual;
     const tab = isSetManual
       ? document.querySelector(`.tab-container .tab[data-tab="${tabId}"]`)
-      : e.target.closest(".tab");
+      : e.target.closest('.tab');
 
-    if (!tab || tab.classList.contains("tab--active")) return;
+    if (!tab || tab.classList.contains('tab--active')) return;
     goToTab(tab.dataset.tab);
 
     this._closeSearchBox();
@@ -1350,47 +1356,45 @@ class UI {
   #searchBarToggle(e) {
     const openSearchBox = function () {
       // Remove search icon and add clear icon
-      document
-        .querySelectorAll(".btn--search .search__icon")
-        .forEach((icon) => {
-          icon.classList.remove("active");
+      document.querySelectorAll('.btn--search .search__icon').forEach(icon => {
+        icon.classList.remove('active');
 
-          if (icon.classList.contains("icon--clear"))
-            icon.classList.add("active");
-        });
+        if (icon.classList.contains('icon--clear'))
+          icon.classList.add('active');
+      });
 
       // Remove hidden class from input
       const input = document.querySelector(
-        ".form__search--stations .form__input",
+        '.form__search--stations .form__input',
       );
-      input.classList.remove("hidden");
+      input.classList.remove('hidden');
       setTimeout(() => input.focus({ preventScroll: true }), 250);
     };
-    const btnSearch = e.target.closest(".btn--search");
+    const btnSearch = e.target.closest('.btn--search');
     if (!btnSearch) return;
     const type = e.target.dataset.type;
 
-    if (type === "search") openSearchBox();
-    if (type === "clear") this._closeSearchBox();
+    if (type === 'search') openSearchBox();
+    if (type === 'clear') this._closeSearchBox();
 
     return this;
   }
   _closeSearchBox() {
     // Remove search icon and add search icon
-    document.querySelectorAll(".btn--search .search__icon").forEach((icon) => {
-      icon.classList.remove("active");
+    document.querySelectorAll('.btn--search .search__icon').forEach(icon => {
+      icon.classList.remove('active');
 
-      if (icon.classList.contains("icon--search")) icon.classList.add("active");
+      if (icon.classList.contains('icon--search')) icon.classList.add('active');
     });
 
     // Add hidden class for input
     const input = document.querySelector(
-      ".form__search--stations .form__input",
+      '.form__search--stations .form__input',
     );
 
     input.blur();
-    input.classList.add("hidden");
-    input.value = "";
+    input.classList.add('hidden');
+    input.value = '';
 
     // Render all staion cards
     app._renderAllStationCards();
@@ -1399,13 +1403,13 @@ class UI {
   }
   #projectCancelEditBtnActions(e) {
     const projectCancelBtn = e.target.closest(
-      ".project--form .form__btn--cancel",
+      '.project--form .form__btn--cancel',
     );
-    const projectEditBtn = e.target.closest(".project--form .form__btn--edit");
+    const projectEditBtn = e.target.closest('.project--form .form__btn--edit');
 
     if (
       !projectCancelBtn &&
-      (!projectEditBtn || projectEditBtn.classList.contains("hidden"))
+      (!projectEditBtn || projectEditBtn.classList.contains('hidden'))
     )
       return;
     e.preventDefault();
@@ -1415,7 +1419,7 @@ class UI {
   }
   #stationFormCancelBtnActions(e) {
     const stationFormCancelBtn = e.target.closest(
-      ".station--form .form__btn--cancel",
+      '.station--form .form__btn--cancel',
     );
     if (!stationFormCancelBtn) return;
     e.preventDefault();
@@ -1426,10 +1430,10 @@ class UI {
   //ContextMenu
   #openContextMenu(e) {
     e.preventDefault();
-    const screenLimiterOverlay = e.target.closest(".screen-limiter--overlay");
-    const screenLimiter = e.target.closest(".screen-limiter");
-    const preloader = e.target.closest(".preloader");
-    const preloaderOverlay = e.target.closest(".preloader--overlay");
+    const screenLimiterOverlay = e.target.closest('.screen-limiter--overlay');
+    const screenLimiter = e.target.closest('.screen-limiter');
+    const preloader = e.target.closest('.preloader');
+    const preloaderOverlay = e.target.closest('.preloader--overlay');
     if (screenLimiter || screenLimiterOverlay || preloader || preloaderOverlay)
       return;
 
@@ -1440,14 +1444,14 @@ class UI {
       cardForm = false,
     } = {}) {
       const setHtml = () => {
-        let html = `<article class="context--menu hidden" ${station ? `data-id="${station.id}"` : ""}>`;
+        let html = `<article class="context--menu hidden" ${station ? `data-id="${station.id}"` : ''}>`;
 
         // Title
         if (marker || card)
           html += `
           <ul class="station__context">
             <li class="context__item title">
-              <span>${station?.title || "Elektrinės pavadinimas"}</span>
+              <span>${station?.title || 'Elektrinės pavadinimas'}</span>
             </li>
         `;
         // Copy Coordinates
@@ -1456,8 +1460,8 @@ class UI {
             <li class="context__item copy">
               <div class="context__item-copy--container">
                 <div class="context-copy-coords--container">
-                  <span>${station?.coords[0] || "0"}</span>
-                  <span>${station?.coords[1] || "0"}</span>
+                  <span>${station?.coords[0] || '0'}</span>
+                  <span>${station?.coords[1] || '0'}</span>
                 </div>
                 <div class="context-copy-icon--container">
                   <i class="context--icon ph-bold ph-clipboard-text"></i>
@@ -1515,33 +1519,33 @@ class UI {
 
         return html;
       };
-      if (document.querySelector(".context--menu")) return;
+      if (document.querySelector('.context--menu')) return;
 
       // Close popus
       app._closePopup();
 
-      body.insertAdjacentHTML("afterbegin", setHtml());
+      body.insertAdjacentHTML('afterbegin', setHtml());
 
-      const contextMenu = document.querySelector(".context--menu");
+      const contextMenu = document.querySelector('.context--menu');
       const margin = 5;
 
       // Set Top and Left position of menu
       contextMenu.style.top = `${e.y + contextMenu.offsetHeight > window.innerHeight ? window.innerHeight - contextMenu.offsetHeight - margin : e.y}px`;
       contextMenu.style.left = `${e.x + contextMenu.offsetWidth > window.innerWidth ? window.innerWidth - contextMenu.offsetWidth - margin : e.x + margin}px`;
-      setTimeout(() => contextMenu.classList.remove("hidden"), 10);
+      setTimeout(() => contextMenu.classList.remove('hidden'), 10);
     };
 
-    const marker = e.target.closest(".leaflet-marker-icon");
-    const card = e.target.closest(".station--content .station");
-    const contextItem = e.target.closest(".context--menu .context__item");
+    const marker = e.target.closest('.leaflet-marker-icon');
+    const card = e.target.closest('.station--content .station');
+    const contextItem = e.target.closest('.context--menu .context__item');
 
     const isPopWindowOpen =
-      body.classList.contains("modal--open") ||
-      body.classList.contains("documentation--open") ||
-      body.classList.contains("main-menu--open") ||
-      body.classList.contains("draggable--on");
+      body.classList.contains('modal--open') ||
+      body.classList.contains('documentation--open') ||
+      body.classList.contains('main-menu--open') ||
+      body.classList.contains('draggable--on');
 
-    if (marker && !marker.alt.includes("Projekto") && !isPopWindowOpen) {
+    if (marker && !marker.alt.includes('Projekto') && !isPopWindowOpen) {
       this.#closeContextMenu(e);
       openMenu({
         marker: true,
@@ -1576,43 +1580,43 @@ class UI {
   }
   #closeContextMenu(e) {
     const remove = () => {
-      const contextMenu = document.querySelector(".context--menu");
+      const contextMenu = document.querySelector('.context--menu');
       if (!contextMenu) return;
       contextMenu.parentElement.removeChild(contextMenu);
     };
 
-    const contextMenu = e.target.closest(".context--menu");
+    const contextMenu = e.target.closest('.context--menu');
     const contextItem = e.target.closest(
-      ".context--menu .context__item:not(.title)",
+      '.context--menu .context__item:not(.title)',
     );
     if (contextMenu && !contextItem) return;
 
     remove();
   }
   #contextMenuButtons(e) {
-    const contextItem = e.target.closest(".context__item");
+    const contextItem = e.target.closest('.context__item');
     if (!contextItem) return;
 
-    const id = document.querySelector(".context--menu").dataset.id;
+    const id = document.querySelector('.context--menu').dataset.id;
 
     // Copy Coordinates to clipboard
-    if (contextItem.classList.contains("copy") && id) {
+    if (contextItem.classList.contains('copy') && id) {
       const station = app._searchStationById(id);
       if (!station) return;
 
-      navigator.clipboard.writeText(station.coords.join(", "));
+      navigator.clipboard.writeText(station.coords.join(', '));
     }
 
     // Move Station
-    if (contextItem.classList.contains("move") && id) app._moveMarker(id);
+    if (contextItem.classList.contains('move') && id) app._moveMarker(id);
 
     // Edit Station
-    if (contextItem.classList.contains("edit") && id)
+    if (contextItem.classList.contains('edit') && id)
       this.#openStationCardForm(id);
 
     // Delete Station
-    if (contextItem.classList.contains("delete") && id) {
-      const title = app._searchStationById(id)?.title || "Pavadinimu";
+    if (contextItem.classList.contains('delete') && id) {
+      const title = app._searchStationById(id)?.title || 'Pavadinimu';
       this._showPopupWindow(
         `Elektrinė bus pašalinta <span>${title}</span><br/>Ar tikrai to norite?`,
         {
@@ -1625,29 +1629,29 @@ class UI {
     }
 
     // Documentation
-    if (contextItem.classList.contains("info"))
-      this._showPopupWindow(null, { type: "documentation" });
+    if (contextItem.classList.contains('info'))
+      this._showPopupWindow(null, { type: 'documentation' });
 
     // Erase all data
-    if (contextItem.classList.contains("erase"))
+    if (contextItem.classList.contains('erase'))
       this._showPopupWindow(
-        "Visi duomenys bus pašalinti<br/>Ar tikrai to norite?",
+        'Visi duomenys bus pašalinti<br/>Ar tikrai to norite?',
         { onlyDisplay: false, cbFunction: app.resetLocalStorage },
       );
   }
 
   //MainMenu
   #openMenu(e) {
-    const menuBtn = e.target.closest(".btn.main-menu");
+    const menuBtn = e.target.closest('.btn.main-menu');
     if (!menuBtn) return;
 
     app._closePopup();
-    this._showPopupWindow(null, { type: "menu" });
+    this._showPopupWindow(null, { type: 'menu' });
   }
 
   // MARKERS: MouseOver, MouseOut markers, cards
   #moveToMarkerByCard(e) {
-    const stationEl = e.target.closest(".station");
+    const stationEl = e.target.closest('.station');
     if (!stationEl) return;
 
     const station = app._searchStationById(stationEl.dataset.id);
@@ -1658,7 +1662,7 @@ class UI {
     station.marker.openPopup();
   }
   #onHoverCard(e) {
-    const card = e.target.closest(".station");
+    const card = e.target.closest('.station');
     if (!card) return;
 
     const marker = document.querySelector(
@@ -1666,10 +1670,10 @@ class UI {
     );
     if (!marker) return;
 
-    marker.classList.add("hovered");
+    marker.classList.add('hovered');
   }
   #onHoverOutCard(e) {
-    const card = e.target.closest(".station");
+    const card = e.target.closest('.station');
     if (!card) return;
 
     const marker = document.querySelector(
@@ -1677,10 +1681,10 @@ class UI {
     );
     if (!marker) return;
 
-    marker.classList.remove("hovered");
+    marker.classList.remove('hovered');
   }
   #onHoverMarker(e) {
-    const marker = e.target.closest(".leaflet-marker-icon");
+    const marker = e.target.closest('.leaflet-marker-icon');
     if (!marker) return;
 
     const cards = document.querySelectorAll(
@@ -1688,10 +1692,10 @@ class UI {
     );
     if (cards.length === 0) return;
 
-    cards.forEach((card) => card.classList.add("hovered"));
+    cards.forEach(card => card.classList.add('hovered'));
   }
   #onHoverOutMarker(e) {
-    const marker = e.target.closest(".leaflet-marker-icon");
+    const marker = e.target.closest('.leaflet-marker-icon');
     if (!marker) return;
 
     const cards = document.querySelectorAll(
@@ -1699,7 +1703,7 @@ class UI {
     );
     if (cards.length === 0) return;
 
-    cards.forEach((card) => card.classList.remove("hovered"));
+    cards.forEach(card => card.classList.remove('hovered'));
   }
 
   // Station Cards
@@ -1712,47 +1716,47 @@ class UI {
         const stationCard = document.querySelector(
           `.station--content .station[data-id="${id}"]`,
         );
-        const stationFormInputs = stationCard.querySelectorAll("input");
+        const stationFormInputs = stationCard.querySelectorAll('input');
         const station = app._searchStationById(id);
 
         // Render form
-        stationCards.forEach((card) => {
-          card.classList.remove("station__card--active");
-          if (!card.classList.contains("station--form")) return;
+        stationCards.forEach(card => {
+          card.classList.remove('station__card--active');
+          if (!card.classList.contains('station--form')) return;
 
-          card.classList.add("station__card--active");
+          card.classList.add('station__card--active');
         });
 
         // Set Form values
-        stationFormInputs.forEach((input) => {
-          if (input.type === "checkbox") return (input.checked = false);
+        stationFormInputs.forEach(input => {
+          if (input.type === 'checkbox') return (input.checked = false);
 
           // Set Latitude
-          if (input.classList.contains("form__input--latitude")) {
-            input.value = station ? station.coords[0] : "0";
+          if (input.classList.contains('form__input--latitude')) {
+            input.value = station ? station.coords[0] : '0';
             setTimeout(() => input.focus({ preventScroll: true }), 250);
           }
 
           // Set Longitude
-          if (input.classList.contains("form__input--longitude"))
-            input.value = station ? station.coords[1] : "0";
+          if (input.classList.contains('form__input--longitude'))
+            input.value = station ? station.coords[1] : '0';
 
           // Set Title
-          if (input.classList.contains("form__input--title"))
-            input.value = station ? station.title : "Elektrinės pavadinimas";
+          if (input.classList.contains('form__input--title'))
+            input.value = station ? station.title : 'Elektrinės pavadinimas';
 
           // Set balance
-          if (input.classList.contains("form__input--balance"))
-            input.value = station ? station.balance : "0";
+          if (input.classList.contains('form__input--balance'))
+            input.value = station ? station.balance : '0';
         });
 
         // Set distance
         if (station && station.distance.km >= 0 && station.distance.m >= 0) {
           const km = stationCard.querySelector(
-            ".station__distance .distance--km",
+            '.station__distance .distance--km',
           );
           const m = stationCard.querySelector(
-            ".station__distance .distance--m",
+            '.station__distance .distance--m',
           );
 
           km.textContent = station.distance.km;
@@ -1763,9 +1767,9 @@ class UI {
         setTimeout(
           () =>
             stationCard.scrollIntoView({
-              behavior: "smooth",
-              block: "center",
-              container: "nearest",
+              behavior: 'smooth',
+              block: 'center',
+              container: 'nearest',
             }),
           time / 3,
         );
@@ -1779,7 +1783,7 @@ class UI {
 
     const isFormsOpen = this.#isSomeStationFormsActive();
     const formStationNew = document.querySelector(
-      ".station--content .form__station--new",
+      '.station--content .form__station--new',
     );
 
     // Close all forms and searchboxes, change to Stations tab
@@ -1795,56 +1799,56 @@ class UI {
   }
   _removeStationsForm() {
     const allStations = document.querySelectorAll(
-      ".station--content .stations .station--card",
+      '.station--content .stations .station--card',
     );
 
-    allStations.forEach((station) => {
+    allStations.forEach(station => {
       //Remove active form class from all cards
-      station.classList.remove("station__card--active");
+      station.classList.remove('station__card--active');
 
       //Add active class to card
-      if (!station.classList.contains("station--form"))
-        station.classList.add("station__card--active");
+      if (!station.classList.contains('station--form'))
+        station.classList.add('station__card--active');
     });
   }
   _removeAllStationCards({ animation = false } = {}) {
     const stationContainer = document.querySelector(
-      ".station--content .stations",
+      '.station--content .stations',
     );
 
-    const allStations = stationContainer.querySelectorAll(".station");
+    const allStations = stationContainer.querySelectorAll('.station');
 
     if (animation) {
-      allStations.forEach((station) => station.classList.add("hidden"));
+      allStations.forEach(station => station.classList.add('hidden'));
     }
 
     animation
-      ? setTimeout(() => (stationContainer.innerHTML = ""), 550)
-      : (stationContainer.innerHTML = "");
+      ? setTimeout(() => (stationContainer.innerHTML = ''), 550)
+      : (stationContainer.innerHTML = '');
 
     return this;
   }
   #isStationFormActive(station) {
-    const form = station.querySelector(".station--form");
+    const form = station.querySelector('.station--form');
     if (!form) return false;
 
-    return form.classList.contains("station__card--active");
+    return form.classList.contains('station__card--active');
   }
   #isSomeStationFormsActive() {
     const stations = document.querySelectorAll(
-      ".station--content .station--card.station--form",
+      '.station--content .station--card.station--form',
     );
     if (stations.length === 0) return false;
 
-    return [...stations].some((card) =>
-      card.classList.contains("station__card--active"),
+    return [...stations].some(card =>
+      card.classList.contains('station__card--active'),
     );
   }
 
   // Render create New Station Form
   #renderCreateStationForm(e) {
     const createForm = function () {
-      const tab = document.querySelector(".form__search--stations");
+      const tab = document.querySelector('.form__search--stations');
       const html = `
             <form class="form form__station--new hidden" data-form-type="manual">
               <div
@@ -1993,22 +1997,22 @@ class UI {
             </form>
     `;
 
-      tab.insertAdjacentHTML("afterend", html);
+      tab.insertAdjacentHTML('afterend', html);
 
       // Set focus on latitude input
       setTimeout(() => {
         const input = document.querySelector(
-          ".form__station--new .form__input--latitude",
+          '.form__station--new .form__input--latitude',
         );
         if (!input) return;
         input.focus({ preventScroll: true });
       }, 300);
     };
-    const btnCreate = e.target.closest(".btn--new__station");
+    const btnCreate = e.target.closest('.btn--new__station');
     if (!btnCreate) return;
 
     // Do not add new form if it already exists
-    if (document.querySelector(".form__station--new")) return;
+    if (document.querySelector('.form__station--new')) return;
 
     // Close searchBox
     this._closeSearchBox();
@@ -2019,14 +2023,14 @@ class UI {
     createForm();
 
     // Display Form
-    const addNewForm = document.querySelector(".form__station--new");
-    setTimeout(() => addNewForm.classList.remove("hidden"), 10);
+    const addNewForm = document.querySelector('.form__station--new');
+    setTimeout(() => addNewForm.classList.remove('hidden'), 10);
 
     return this;
   }
   #removeCreateStationForm(e) {
     const cancelBtn = e.target.closest(
-      ".form__station--new .form__btn--cancel",
+      '.form__station--new .form__btn--cancel',
     );
     if (!cancelBtn) return;
     e.preventDefault();
@@ -2036,15 +2040,15 @@ class UI {
     return this;
   }
   _removeCreateStationForm(removeDelay = 550) {
-    const addNewForm = document.querySelector(".form__station--new");
+    const addNewForm = document.querySelector('.form__station--new');
     if (!addNewForm) return;
 
     // Close searchbox
     ui._closeSearchBox();
 
-    addNewForm.classList.add("hidden");
+    addNewForm.classList.add('hidden');
     setTimeout(() => {
-      const addNewForm = document.querySelector(".form__station--new");
+      const addNewForm = document.querySelector('.form__station--new');
       if (addNewForm) addNewForm.parentElement.removeChild(addNewForm);
     }, removeDelay);
   }
@@ -2053,23 +2057,23 @@ class UI {
   _showPopupWindow(
     message,
     {
-      type = "modal",
+      type = 'modal',
       onlyDisplay = true,
       cbFunction = () => {},
       args = [],
       object = null,
     } = {},
   ) {
-    const map = document.getElementById("map");
+    const map = document.getElementById('map');
     let className;
-    if (type === "modal") className = "modal--open";
-    if (type === "documentation") className = "documentation--open";
-    if (type === "menu") className = "main-menu--open";
+    if (type === 'modal') className = 'modal--open';
+    if (type === 'documentation') className = 'documentation--open';
+    if (type === 'menu') className = 'main-menu--open';
 
     const createPopupWindow = function () {
       const setHtml = () => {
-        let html = "";
-        if (type === "modal") {
+        let html = '';
+        if (type === 'modal') {
           html += `
           <div class="modal">
             <button class="btn btn--close-modal">&times;</button>
@@ -2086,71 +2090,42 @@ class UI {
 
           html += `</div></div>`;
         }
-        if (type === "documentation") {
-          html += `
-          <figure class="documentation">
-            <button class="btn btn--close-documentation">&times;</button>
-            <div class="documentation-content">
-              <ul class="documentation-nav">
-                <li class="documentation-nav--item">1. Titulas</li>
-                <li class="documentation-nav--item">2. Idejimas</li>
-                <li class="documentation-nav--item">3. Norejimas</li>
-              </ul>
-              <article class="documentation--main">
-                <h2>Dokumentacija</h2>
-              </article>
-            </div>
-            <div class="documentation-nav--page">1/3</div>
-          </figure>
-          `;
-        }
-        if (type === "menu") {
-          html += `
-          <nav class="main-menu--container">
-            <button class="btn btn--close-main-menu">&times;</button>
-            <ul class="main-menu--nav">
-              <li class="main-menu--nav__item project">
-                <i class="main-menu--nav__icon ph-bold ph-house-line"></i>
-                <button class="btn main-menu-nav--btn">Projektas</button>
-              </li>
-              <li class="main-menu--nav__item stations">
-                <i class="main-menu--nav__icon ph-bold ph-nuclear-plant"></i>
-                <button class="btn main-menu-nav--btn">Elektrinės</button>
-              </li>
-              <li class="main-menu--nav__item info">
-                <i class="main-menu--nav__icon ph-bold ph-book-open-text"></i>
-                <button class="btn main-menu-nav--btn">Žinynas</button>
-              </li>
-              <li class="main-menu--nav__item delete">
-                <i class="main-menu--nav__icon ph-bold ph-eraser"></i>
-                <button class="btn main-menu-nav--btn">
-                  Išvalyti visus duomenis
-                </button>
-              </li>
-            </ul>
-            <a
-              href="https://antanas-jasiulionis.lt/"
-              class="main-menu--link"
-              draggable="false"
-              target="_blank"
-              ><p>Apie <span>Elektro</span>map</p>
-              <i class="ph-fill ph-arrow-circle-right"></i
-            ></a>
-          </nav>
-          `;
-        }
+        if (type === 'documentation') html += getDocumentationHtml();
+
+        if (type === 'menu') html += getMenuHtml();
 
         html += '<div class="overlay"></div>';
         return html;
       };
+      const documentationGenerateButtons = () => {
+        const allHeadings = document.querySelectorAll(
+          '.documentation-content-item--heading',
+        );
+        const navContainer = document.querySelector('.documentation-nav--list');
+        if (allHeadings.length === 0) return;
+
+        allHeadings.forEach((heading, i) => {
+          heading.closest('.documentation-content-item').style.transform =
+            `translateY(${i * 100}%)`;
+
+          const title = heading.textContent.trim().toUpperCase();
+          const html = `
+          <li class="documentation-nav--item${i === 0 ? ' active' : ''}" data-content="${i}">${title}</li>
+          `;
+          navContainer.insertAdjacentHTML('beforeend', html);
+        });
+      };
       if (
-        body.classList.contains("modal--open") ||
-        body.classList.contains("documentation--open") ||
-        body.classList.contains("main-menu--open")
+        body.classList.contains('modal--open') ||
+        body.classList.contains('documentation--open') ||
+        body.classList.contains('main-menu--open')
       )
         return;
 
-      body.insertAdjacentHTML("afterbegin", setHtml());
+      // Add content to HTML
+      body.insertAdjacentHTML('afterbegin', setHtml());
+      if (type === 'documentation') documentationGenerateButtons();
+
       setTimeout(() => body.classList.add(className), 10);
     };
     const removePopupWindow = function ({ instant = false } = {}) {
@@ -2168,22 +2143,22 @@ class UI {
       overlay.parentElement.removeChild(overlay);
     };
     const isPopupWindowExist =
-      document.querySelector(".modal") ||
-      document.querySelector(".documentation") ||
-      document.querySelector(".main-menu--container") ||
-      document.querySelector(".overlay");
+      document.querySelector('.modal') ||
+      document.querySelector('.documentation') ||
+      document.querySelector('.main-menu--container') ||
+      document.querySelector('.overlay');
     if (isPopupWindowExist) return;
 
     map.blur();
     createPopupWindow();
 
     let popupWindow;
-    if (type === "modal") popupWindow = document.querySelector(".modal");
-    if (type === "documentation")
-      popupWindow = document.querySelector(".documentation");
-    if (type === "menu")
-      popupWindow = document.querySelector(".main-menu--container");
-    const overlay = document.querySelector(".overlay");
+    if (type === 'modal') popupWindow = document.querySelector('.modal');
+    if (type === 'documentation')
+      popupWindow = document.querySelector('.documentation');
+    if (type === 'menu')
+      popupWindow = document.querySelector('.main-menu--container');
+    const overlay = document.querySelector('.overlay');
     if (!popupWindow || !overlay) return;
 
     const abortListeners = new AbortController();
@@ -2191,74 +2166,74 @@ class UI {
 
     // Do Actions on window buttons
     popupWindow.addEventListener(
-      "click",
-      (e) => {
+      'click',
+      e => {
         const btn = e.target;
         let btnClose = undefined;
         let btnReturn = undefined;
         let btnAction = undefined;
         let instant = false;
 
-        if (type === "modal") {
-          btnClose = btn.closest(".btn--close-modal");
-          btnReturn = btn.closest(".btn--return-modal");
+        if (type === 'modal') {
+          btnClose = btn.closest('.btn--close-modal');
+          btnReturn = btn.closest('.btn--return-modal');
         }
-        if (type === "documentation")
-          btnClose = btn.closest(".btn--close-documentation");
+        if (type === 'documentation')
+          btnClose = btn.closest('.btn--close-documentation');
 
-        if (type === "menu") btnClose = btn.closest(".btn--close-main-menu");
+        if (type === 'menu') btnClose = btn.closest('.btn--close-main-menu');
 
         // Do Actions
         // Modal Window
-        if (type === "modal" && !onlyDisplay) {
-          btnAction = btn.closest(".btn--action-modal");
+        if (type === 'modal' && !onlyDisplay) {
+          btnAction = btn.closest('.btn--action-modal');
           if (btnAction) cbFunction.call(object, ...args);
         }
 
         // Main Menu
-        if (type === "menu") {
+        if (type === 'menu') {
           const isBtnContains = function (btnName) {
             return btnAction?.classList.contains(`${btnName}`);
           };
-          btnAction = btn.closest(".main-menu--nav__item");
+          btnAction = btn.closest('.main-menu--nav__item');
 
           if (
-            isBtnContains("project") ||
-            isBtnContains("stations") ||
-            isBtnContains("info") ||
-            isBtnContains("delete")
+            isBtnContains('project') ||
+            isBtnContains('stations') ||
+            isBtnContains('info') ||
+            isBtnContains('delete')
           )
             instant = true;
 
           // Project
-          if (isBtnContains("project"))
+          if (isBtnContains('project'))
             this.#changeActiveTab(null, { setManual: [true, 0] });
 
           // Stations
-          if (isBtnContains("stations"))
+          if (isBtnContains('stations'))
             this.#changeActiveTab(null, { setManual: [true, 1] });
 
           // Documentation
-          if (isBtnContains("info"))
+          if (isBtnContains('info'))
             setTimeout(
-              () => this._showPopupWindow(null, { type: "documentation" }),
+              () => this._showPopupWindow(null, { type: 'documentation' }),
               50,
             );
 
           // Delete
-          if (isBtnContains("delete"))
+          if (isBtnContains('delete'))
             setTimeout(
               () =>
                 this._showPopupWindow(
-                  "Visi duomenys bus pašalinti<br/>Ar tikrai to norite?",
+                  'Visi duomenys bus pašalinti<br/>Ar tikrai to norite?',
                   { onlyDisplay: false, cbFunction: app.resetLocalStorage },
                 ),
               50,
             );
 
           // Link
-          if (btn.closest(".main-menu--link"))
-            btnAction = btn.closest(".main-menu--link");
+          if (btn.closest('.main-menu--link'))
+            btnAction = btn.closest('.main-menu--link');
         }
 
         // Close popup Window when buttons clicked
@@ -2272,7 +2247,7 @@ class UI {
 
     // Close Window on escape and click on overlay
     overlay.addEventListener(
-      "click",
+      'click',
       () => {
         abortListeners.abort();
         removePopupWindow();
@@ -2280,15 +2255,15 @@ class UI {
       option,
     );
     document.addEventListener(
-      "keydown",
-      (e) => {
+      'keydown',
+      e => {
         e.preventDefault();
         let className;
-        if (type === "modal") className = "modal--open";
-        if (type === "documentation") className = "documentation--open";
-        if (type === "menu") className = "main-menu--open";
+        if (type === 'modal') className = 'modal--open';
+        if (type === 'documentation') className = 'documentation--open';
+        if (type === 'menu') className = 'main-menu--open';
 
-        if (e.key === "Escape" && body.classList.contains(className)) {
+        if (e.key === 'Escape' && body.classList.contains(className)) {
           abortListeners.abort();
           removePopupWindow();
         }
@@ -2296,95 +2271,146 @@ class UI {
       option,
     );
   }
+  #documentationAccordion(e) {
+    const itemBtn = e.target.closest('.accordion-item--header');
+    if (!itemBtn) return;
+
+    const accordion = itemBtn.closest('.accordion');
+    const item = itemBtn.closest('.accordion-item');
+    if (!item) return;
+
+    // Close only that accordion item
+    if (item.classList.contains('open')) return item.classList.remove('open');
+
+    // Close all accordion items
+    accordion
+      .querySelectorAll('.accordion-item')
+      .forEach(item => item.classList.remove('open'));
+
+    // Open clicked accordion item
+    item.classList.add('open');
+  }
+  #documentationShowSection(e) {
+    const item = e.target.closest('.documentation-nav--item');
+    if (!item) return;
+
+    const curContent = document.querySelector(
+      `.documentation-content-item[data-content="${item.dataset.content}"]`,
+    );
+    if (!curContent) return;
+
+    const goToContent = function (c) {
+      allContentEl.forEach((content, i) => {
+        content.classList.remove('visible');
+        content.style.transform = `translateY(${(i - c) * 100}%)`;
+
+        if (content.dataset.content === c) content.classList.add('visible');
+      });
+
+      // Activate navigation item
+      document.querySelectorAll('.documentation-nav--item').forEach(nav => {
+        nav.classList.remove('active');
+        if (nav.dataset.content === c) nav.classList.add('active');
+      });
+    };
+
+    const allContentEl = document.querySelectorAll(
+      '.documentation-content-item',
+    );
+    if (allContentEl.length === 0 || curContent.classList.contains('visible'))
+      return;
+
+    goToContent(item.dataset.content);
+  }
 
   //Selection menu
   #showCreateStationFormSelectionMenu(e) {
-    const formCreateNew = document.querySelector(".form__station--new");
+    const formCreateNew = document.querySelector('.form__station--new');
     if (!formCreateNew) return;
 
-    const formSelectorElement = document.querySelector(".form__selector");
-    const formSelector = e.target.closest(".form__selector");
-    const isSelection = e.target.classList.contains("form__selection");
+    const formSelectorElement = document.querySelector('.form__selector');
+    const formSelector = e.target.closest('.form__selector');
+    const isSelection = e.target.classList.contains('form__selection');
 
     // Remove selections if pressed outside selection screen
-    if (!formSelector) return formSelectorElement.classList.remove("open");
-    if (formSelector && !isSelection) formSelector.classList.toggle("open");
+    if (!formSelector) return formSelectorElement.classList.remove('open');
+    if (formSelector && !isSelection) formSelector.classList.toggle('open');
   }
   #changeFormTypeCreateStationForm(e) {
-    const form = document.querySelector(".form__station--new");
+    const form = document.querySelector('.form__station--new');
 
     const toggleForm = function (type) {
-      const formSelector = document.querySelector(".form__selector");
+      const formSelector = document.querySelector('.form__selector');
       const btnSubmit = document.querySelector(
-        ".form__station--new .form__btn--done",
+        '.form__station--new .form__btn--done',
       );
 
       document
-        .querySelectorAll(".form__station--new [data-form]")
-        .forEach((selector) => {
+        .querySelectorAll('.form__station--new [data-form]')
+        .forEach(selector => {
           // Remove all fields that is for manual/excel form
-          selector.classList.add("hidden");
+          selector.classList.add('hidden');
 
           // Add all fields that is used for manual/excel type form
           if (
             selector.dataset.form === type &&
-            !selector.classList.contains("form__selection")
+            !selector.classList.contains('form__selection')
           )
-            selector.classList.remove("hidden");
+            selector.classList.remove('hidden');
 
           // Add selection to menu for manual/excel form
           if (
-            selector.classList.contains("form__selection") &&
+            selector.classList.contains('form__selection') &&
             selector.dataset.form !== type
           )
-            selector.classList.remove("hidden");
+            selector.classList.remove('hidden');
         });
 
       // Change Form type
       form.dataset.formType = type;
 
       // Remove open selections
-      formSelector.classList.remove("open");
+      formSelector.classList.remove('open');
 
       // Make disable submit button
-      if (!btnSubmit.classList.contains("form__btn--disable"))
-        btnSubmit.classList.add("form__btn--disable");
+      if (!btnSubmit.classList.contains('form__btn--disable'))
+        btnSubmit.classList.add('form__btn--disable');
     };
     const resetInputs = () => {
-      const allFormInputs = form.querySelectorAll("input");
-      const excelTextEl = form.querySelector(".excel__row--text");
-      const btnSubmit = form.querySelector(".form__btn--done");
+      const allFormInputs = form.querySelectorAll('input');
+      const excelTextEl = form.querySelector('.excel__row--text');
+      const btnSubmit = form.querySelector('.form__btn--done');
 
       // Reset all inputs
-      allFormInputs.forEach((input) => {
+      allFormInputs.forEach(input => {
         // Add invalid class to text inputs
-        if (input.type === "text") input.classList.add("invalid");
+        if (input.type === 'text') input.classList.add('invalid');
 
         // Reset values
-        if (input.type === "text" || input.type === "file") {
+        if (input.type === 'text' || input.type === 'file') {
           this._removeErrorMessage(input);
-          input.value = "";
+          input.value = '';
         }
 
         // Remove Error message if exists for file
-        if (input.type === "file") this._removeErrorMessage(input);
+        if (input.type === 'file') this._removeErrorMessage(input);
 
         // Add checked status to checkbox
-        if (input.type === "checkbox") input.checked = true;
+        if (input.type === 'checkbox') input.checked = true;
       });
 
       // Add invalid class to text inputs
-      allFormInputs.forEach((input) => {
-        if (input.type === "text") input.classList.add("invalid");
+      allFormInputs.forEach(input => {
+        if (input.type === 'text') input.classList.add('invalid');
       });
 
-      excelTextEl.textContent = "Nepasirinktas failas";
-      btnSubmit.classList.add("form__btn--disable");
+      excelTextEl.textContent = 'Nepasirinktas failas';
+      btnSubmit.classList.add('form__btn--disable');
     };
-    const formSelector = e.target.closest(".form__selector");
+    const formSelector = e.target.closest('.form__selector');
     if (!formSelector) return;
 
-    const selection = e.target.closest(".form__selection");
+    const selection = e.target.closest('.form__selection');
     if (selection) {
       toggleForm(selection.dataset.form);
       resetInputs();
@@ -2395,14 +2421,14 @@ class UI {
   #showToolTip(e) {
     const createToolTip = function (element, desc) {
       // Create element
-      const toolTip = document.createElement("div");
+      const toolTip = document.createElement('div');
       //Add class
-      toolTip.classList.add("tooltip");
+      toolTip.classList.add('tooltip');
       // Set description
       toolTip.innerHTML = desc;
       // Assign tooltip to parent element
       element.prepend(toolTip);
-      setTimeout(() => sidebarContainer.classList.add("tooltip--show"), 10);
+      setTimeout(() => sidebarContainer.classList.add('tooltip--show'), 10);
     };
     const displayToolTip = (element, desc, time = 1000) => {
       if (this.#toolTipTimeOut) clearTimeout(this.#toolTipTimeOut);
@@ -2412,20 +2438,20 @@ class UI {
       );
     };
     const element = e.target;
-    const stationField = element.closest(".station__details");
-    const button = element.closest(".form__btn");
-    const formInputField = element.closest(".form__row");
-    const coordsCheckBox = element.closest(".form--checkbox");
+    const stationField = element.closest('.station__details');
+    const button = element.closest('.form__btn');
+    const formInputField = element.closest('.form__row');
+    const coordsCheckBox = element.closest('.form--checkbox');
     const coordsCheckBoxMessage =
-      "žymėti jei koordinatės nėra <br> globalios (WGS-84 arba Google)";
-    const searchBarOpen = element.closest(".icon--search");
-    const searchBarClose = element.closest(".icon--clear");
-    const createNewStationBtn = element.closest(".btn--new__station");
-    const inputFileText = element.closest(".excel__row--text");
-    const dragBtn = element.closest(".drag__btn");
+      'žymėti jei koordinatės nėra <br> globalios (WGS-84 arba Google)';
+    const searchBarOpen = element.closest('.icon--search');
+    const searchBarClose = element.closest('.icon--clear');
+    const createNewStationBtn = element.closest('.btn--new__station');
+    const inputFileText = element.closest('.excel__row--text');
+    const dragBtn = element.closest('.drag__btn');
 
     // Return if tooltip already exists
-    if (sidebarContainer.classList.contains("tooltip--show")) return;
+    if (sidebarContainer.classList.contains('tooltip--show')) return;
 
     // Show tooltip if it's over balance and distance
     if (stationField)
@@ -2437,7 +2463,7 @@ class UI {
     // Show tooltip if it's input, it does not contain input buttons, it does not contain checkbox or fileText input
     if (
       formInputField &&
-      !formInputField.classList.contains("form__row--submit") &&
+      !formInputField.classList.contains('form__row--submit') &&
       !coordsCheckBox &&
       !inputFileText
     )
@@ -2466,10 +2492,10 @@ class UI {
   }
   #removeToolTip() {
     if (this.#toolTipTimeOut) clearTimeout(this.#toolTipTimeOut);
-    if (!sidebarContainer.classList.contains("tooltip--show")) return;
-    sidebarContainer.classList.remove("tooltip--show");
+    if (!sidebarContainer.classList.contains('tooltip--show')) return;
+    sidebarContainer.classList.remove('tooltip--show');
 
-    const toolTip = document.querySelector(".tooltip");
+    const toolTip = document.querySelector('.tooltip');
     if (!toolTip) return clearTimeout(this.#toolTipTimeOut);
 
     setTimeout(() => toolTip.parentElement.removeChild(toolTip), 250);
@@ -2477,11 +2503,11 @@ class UI {
 
   //Input Events
   #errorMessage(e) {
-    const formInput = e.target.closest(".form input");
+    const formInput = e.target.closest('.form input');
     if (
       !formInput ||
-      formInput.type === "checkbox" ||
-      formInput.classList.contains("input--file")
+      formInput.type === 'checkbox' ||
+      formInput.classList.contains('input--file')
     )
       return;
 
@@ -2491,14 +2517,14 @@ class UI {
     const inputNumbersOnly = (element, isMinusAllowed = true) => {
       const regex = function (value) {
         return value
-          .replace(/[^0-9.-]/g, "")
-          .replace(/^([0-9.]+)-/, "-$1")
-          .replace(/(?!^)-/g, "")
-          .replace(/^(-?)\./, "$1")
-          .replace(/(\..*)\./g, "$1");
+          .replace(/[^0-9.-]/g, '')
+          .replace(/^([0-9.]+)-/, '-$1')
+          .replace(/(?!^)-/g, '')
+          .replace(/^(-?)\./, '$1')
+          .replace(/(\..*)\./g, '$1');
       };
       const regexNoMinus = function (value) {
-        return value.replace(/[^0-9.]/g, "").replace(/(\..*)\./g, "$1");
+        return value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');
       };
 
       const pos = element.selectionStart;
@@ -2520,37 +2546,37 @@ class UI {
         element.setSelectionRange(newPos, newPos);
       }
     };
-    const formInput = e.target.closest(".form input");
+    const formInput = e.target.closest('.form input');
     if (
       !formInput ||
-      formInput.classList.contains("form__input--title") ||
-      formInput.classList.contains("input--file") ||
-      formInput.type === "checkbox"
+      formInput.classList.contains('form__input--title') ||
+      formInput.classList.contains('input--file') ||
+      formInput.type === 'checkbox'
     )
       return;
 
     inputNumbersOnly(
       formInput,
-      !formInput.classList.contains("form__input--balance") &&
-        !formInput.classList.contains("form__input--radius"),
+      !formInput.classList.contains('form__input--balance') &&
+        !formInput.classList.contains('form__input--radius'),
     );
 
     return this;
   }
   #pasteCoordsSplit(e) {
-    const inputLatitude = e.target.closest(".form__input--latitude");
+    const inputLatitude = e.target.closest('.form__input--latitude');
     if (!inputLatitude) return;
     e.preventDefault();
 
     const inputLongitude = e.target
-      .closest(".form__row--coords")
-      .querySelector(".form__input--longitude");
+      .closest('.form__row--coords')
+      .querySelector('.form__input--longitude');
 
-    const [lat = "", lon = ""] = e.clipboardData
-      .getData("text/plain")
+    const [lat = '', lon = ''] = e.clipboardData
+      .getData('text/plain')
       .trim()
       .split(/[,\s]+/)
-      .map((value) => (Number.isFinite(+value) ? value : ""));
+      .map(value => (Number.isFinite(+value) ? value : ''));
 
     inputLatitude.value = lat;
     inputLongitude.value = lon;
@@ -2562,33 +2588,33 @@ class UI {
 
   // Change Input Event
   #checkFileFormatExcel(e) {
-    const inputFileEl = e.target.closest(".input--file");
+    const inputFileEl = e.target.closest('.input--file');
     if (!inputFileEl) return;
 
     const btnSubmit = e.target
-      .closest(".form__station--new")
-      .querySelector(".form__btn--done");
+      .closest('.form__station--new')
+      .querySelector('.form__btn--done');
     const inputText = e.target
-      .closest(".excel__row")
-      .querySelector(".excel__row--text");
+      .closest('.excel__row')
+      .querySelector('.excel__row--text');
 
     const file = inputFileEl.files[0];
-    const fileFormat = file.name.toLowerCase().split(".").slice(-1)[0].trim();
-    const errorMsg = "Blogas failo formatas, pasirinkite .xlsx";
+    const fileFormat = file.name.toLowerCase().split('.').slice(-1)[0].trim();
+    const errorMsg = 'Blogas failo formatas, pasirinkite .xlsx';
 
     // Change input text to file name
     inputText.textContent =
-      inputFileEl.files.length !== 0 ? file.name : "Nepasirinktas failas";
+      inputFileEl.files.length !== 0 ? file.name : 'Nepasirinktas failas';
 
     // Check if format is NOT xlsx
-    if (fileFormat !== "xlsx") {
+    if (fileFormat !== 'xlsx') {
       this.#createErrorMessage(inputFileEl, errorMsg);
-      btnSubmit.classList.add("form__btn--disable");
+      btnSubmit.classList.add('form__btn--disable');
     }
     // Check if format is xlsx
-    if (fileFormat === "xlsx") {
+    if (fileFormat === 'xlsx') {
       this._removeErrorMessage(inputFileEl);
-      btnSubmit.classList.remove("form__btn--disable");
+      btnSubmit.classList.remove('form__btn--disable');
     }
 
     return this;
@@ -2596,71 +2622,71 @@ class UI {
 
   // Utilities
   #createErrorMessage(element, desc) {
-    const form = element.closest(".form");
-    const submitBtn = form.querySelector(".form__btn--done");
+    const form = element.closest('.form');
+    const submitBtn = form.querySelector('.form__btn--done');
 
     // Create element
-    const errorMsg = document.createElement("div");
+    const errorMsg = document.createElement('div');
     //Add class
-    errorMsg.classList.add("error__msg");
+    errorMsg.classList.add('error__msg');
 
     // Set description
     errorMsg.textContent = desc;
 
     // Find parent element of input and other sibling inputs
-    const parentElement = element.classList.contains("form__input--balance")
-      ? element.closest(".station__balance")
-      : element.closest(".form__row");
+    const parentElement = element.classList.contains('form__input--balance')
+      ? element.closest('.station__balance')
+      : element.closest('.form__row');
 
     // Add invalid class to input
-    element.classList.add("invalid");
+    element.classList.add('invalid');
 
     // Disable submit button
-    if (!submitBtn.classList.contains("form__btn--disable"))
-      submitBtn.classList.add("form__btn--disable");
+    if (!submitBtn.classList.contains('form__btn--disable'))
+      submitBtn.classList.add('form__btn--disable');
 
     // Add to parent element message
-    if (parentElement.classList.contains("error__msg--show")) return;
+    if (parentElement.classList.contains('error__msg--show')) return;
     parentElement.prepend(errorMsg);
-    setTimeout(() => parentElement.classList.add("error__msg--show"), 10);
+    setTimeout(() => parentElement.classList.add('error__msg--show'), 10);
 
     return this;
   }
   _removeErrorMessage(element) {
-    const form = element.closest(".form");
-    const submitBtn = form.querySelector(".form__btn--done");
+    const form = element.closest('.form');
+    const submitBtn = form.querySelector('.form__btn--done');
 
     // Find parent element of input
-    const parentElement = element.classList.contains("form__input--balance")
-      ? element.closest(".station__balance")
-      : element.closest(".form__row");
+    const parentElement = element.classList.contains('form__input--balance')
+      ? element.closest('.station__balance')
+      : element.closest('.form__row');
 
     // Find all parent inputs, exclude checkbox
-    const inputs = [...parentElement.querySelectorAll("input")].filter(
-      (input) => input.type !== "checkbox",
+    const inputs = [...parentElement.querySelectorAll('input')].filter(
+      input => input.type !== 'checkbox',
     );
 
-    const errorMsg = parentElement.querySelector(".error__msg");
+    const errorMsg = parentElement.querySelector('.error__msg');
 
     // Remove invalid class from input
-    element.classList.remove("invalid");
+    element.classList.remove('invalid');
 
     // Check if all form inputs are valid
-    const isFormValidInputs = ![...form.querySelectorAll("input")]
-      .filter((input) => input.type !== "checkbox")
-      .some((input) => input.classList.contains("invalid"));
+    const isFormValidInputs = ![...form.querySelectorAll('input')]
+      .filter(input => input.type !== 'checkbox')
+      .some(input => input.classList.contains('invalid'));
 
     // Make submit button active
-    if (isFormValidInputs && submitBtn.classList.contains("form__btn--disable"))
-      submitBtn.classList.remove("form__btn--disable");
+    if (isFormValidInputs && submitBtn.classList.contains('form__btn--disable'))
+      submitBtn.classList.remove('form__btn--disable');
 
     if (
-      inputs.some((input) => input.classList.contains("invalid")) ||
-      !parentElement.classList.contains("error__msg--show")
+      inputs.some(input => input.classList.contains('invalid')) ||
+      !parentElement.classList.contains('error__msg--show')
     )
       return;
     // Remove show message class from parent
-    parentElement.classList.remove("error__msg--show");
+    parentElement.classList.remove('error__msg--show');
 
     // Remove error message
     setTimeout(() => parentElement.removeChild(errorMsg), 250);
@@ -2668,12 +2694,12 @@ class UI {
     return this;
   }
   #validInputs = throttle(
-    (input) => {
-      const errorMsg = "Laukas negali būti tuščias";
+    input => {
+      const errorMsg = 'Laukas negali būti tuščias';
 
       if (
         input.value.length === 0 ||
-        (input.classList.contains("form__input--balance") && input.value < 0)
+        (input.classList.contains('form__input--balance') && input.value < 0)
       ) {
         this.#createErrorMessage(input, errorMsg);
       } else {
@@ -2686,24 +2712,24 @@ class UI {
     false,
   );
   _addLoader() {
-    const mainContent = document.querySelector(".main-content");
-    const loader = document.createElement("div");
-    if (sidebarContainer.classList.contains("loading")) return;
+    const mainContent = document.querySelector('.main-content');
+    const loader = document.createElement('div');
+    if (sidebarContainer.classList.contains('loading')) return;
 
-    tabs.forEach((button) => (button.disabled = true));
+    tabs.forEach(button => (button.disabled = true));
 
-    loader.classList.add("loader");
+    loader.classList.add('loader');
     mainContent.prepend(loader);
-    setTimeout(() => sidebarContainer.classList.add("loading"), 10);
+    setTimeout(() => sidebarContainer.classList.add('loading'), 10);
   }
   _removeLoader({ instant = false } = {}) {
     setTimeout(
       () => {
-        const loader = document.querySelector(".loader");
-        if (!sidebarContainer.classList.contains("loading") || !loader) return;
+        const loader = document.querySelector('.loader');
+        if (!sidebarContainer.classList.contains('loading') || !loader) return;
 
-        tabs.forEach((button) => (button.disabled = false));
-        sidebarContainer.classList.remove("loading");
+        tabs.forEach(button => (button.disabled = false));
+        sidebarContainer.classList.remove('loading');
         setTimeout(() => loader.parentElement.removeChild(loader), 250);
       },
       instant ? 15 : 500,
