@@ -31,7 +31,7 @@
 @media (max-width: 46em) {
   .documentation {
     width: 85rem;
-    column-gap: 1.6rem;
+    column-gap: 0;
   }
 }
 

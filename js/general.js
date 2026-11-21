@@ -2257,13 +2257,15 @@ class UI {
     document.addEventListener(
       'keydown',
       e => {
+        if (e.key !== 'Escape') return;
         e.preventDefault();
+
         let className;
         if (type === 'modal') className = 'modal--open';
         if (type === 'documentation') className = 'documentation--open';
         if (type === 'menu') className = 'main-menu--open';
 
-        if (e.key === 'Escape' && body.classList.contains(className)) {
+        if (body.classList.contains(className)) {
           abortListeners.abort();
           removePopupWindow();
         }
